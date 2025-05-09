@@ -22,7 +22,7 @@ services:
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
     ports:
-      - 8883:8883
+      - 1883:1883
       - 9002:9001
   postgres:
     image: postgres:14-alpine

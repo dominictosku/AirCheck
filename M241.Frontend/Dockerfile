@@ -12,10 +12,10 @@ RUN npm i
 
 # Copy the entire project
 COPY . ./
-RUN echo "VITE_API_URL=\"rpi.m241.api64.de\"" > ./.env
+RUN echo "VITE_API_URL=\"localhost:8081\"" > ./.env
 RUN echo "VITE_API_ENDPOINT_PREFIX=\"api/\"" >> ./.env
-RUN echo "VITE_API_PROTOCOL=\"https://\"" >> ./.env
-RUN echo "VITE_API_WSPROTOCOL=\"wss://\"" >> ./.env
+RUN echo "VITE_API_PROTOCOL=\"http://\"" >> ./.env
+RUN echo "VITE_API_WSPROTOCOL=\"ws://\"" >> ./.env
 
 # Build the project
 RUN NODE_OPTIONS=--max-old-space-size=2048 npm run build

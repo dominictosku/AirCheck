@@ -24,17 +24,10 @@ namespace M241.Server.Services
             _client = new MqttClientFactory().CreateMqttClient();
 
             _options = new MqttClientOptionsBuilder()
-                .WithTcpServer(configuration["MQTT:server"], 8883)
+                .WithTcpServer(configuration["MQTT:server"], 1883)
                 .WithCredentials(configuration["MQTT:user"], configuration["MQTT:password"])
                 .WithWillQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
-                .WithTlsOptions(tls => {
-                    tls.UseTls();
-                    tls.WithAllowUntrustedCertificates();
-                    tls.WithIgnoreCertificateChainErrors();
-                    tls.WithIgnoreCertificateRevocationErrors();
-                    tls.WithCertificateValidationHandler(_ => true);
-                })
                 .Build();
 
             _logger = logger;

@@ -1,9 +1,8 @@
 #include <Wire.h>
-#include <SPI.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME680.h>
 #include <Arduino_JSON.h>
-#include <WiFiNINA.h>
+#include <WiFiS3.h>
 #include <MQTTClient.h>
 #include <WiFiUdp.h>
 #include <NTPClient.h>
@@ -18,11 +17,23 @@ const char* mqttHost = MQTT_HOST;
 const int mqttPort = MQTT_PORT;
 const char* mqttQueue = MQTT_QUEUE;
 const boolean debuggingEnabled = DEBUGGING_ENABLED;
+const float TEMP_OFFSET = -2.0;
+
+#define BME_SCK 13
+#define BME_MISO 12
+#define BME_MOSI 11
+#define BME_CS 10
+
+#define SEALEVELPRESSURE_HPA (1013.25)
+
+// Adafruit_BME680 bme(&Wire); // I2C
+//Adafruit_BME680 bme(&Wire1); // example of I2C on another bus
+Adafruit_BME680 bme(BME_CS); // hardware SPI
+//Adafruit_BME680 bme(BME_CS, BME_MOSI, BME_MISO,  BME_SCK);
 
 String macAddress;
-WiFiSSLClient wiFiClient;
+WiFiClient wiFiClient;
 MQTTClient mqttClient(1024);
-Adafruit_BME680 bme(10);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
@@ -136,14 +147,16 @@ void publishSensorData() {
   JSONVar json;
   json["macAddress"] = macAddress;
   json["timestamp"] = timeClient.getEpochTime();
-  json["temperature"] = bme.temperature;
+  json["temperature"] = bme.temperature + TEMP_OFFSET;
   json["humidity"] = bme.humidity;
   json["pressure"] = bme.pressure;
   json["gas"] = bme.gas_resistance;
 
-  if (mqttClient.publish(mqttQueue, JSON.stringify(json).c_str(), false, 2)) {
+  String payload = JSON.stringify(json);
+  if (mqttClient.publish(mqttQueue, payload.c_str())) {
     Serial.println("Published data (QoS = exactly once)");
   } else {
     Serial.println("Failed to publish");
+    Serial.println("Payload was: " + payload);
   }
 }

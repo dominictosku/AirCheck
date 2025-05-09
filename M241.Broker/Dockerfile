@@ -3,7 +3,6 @@ FROM eclipse-mosquitto:2.0.21
 
 RUN apk add --no-cache dos2unix
 COPY config/mosquitto.conf /mosquitto/config/mosquitto.conf
-COPY config/certs/ /mosquitto/certs/
 COPY docker-entrypoint.sh /
 
 RUN dos2unix /docker-entrypoint.sh
